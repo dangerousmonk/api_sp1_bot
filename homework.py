@@ -72,7 +72,10 @@ def main():
                     new_homework.get('homeworks')[0]
                 ), bot)
                 logging.info('Отправлено сообщение')
-            current_timestamp = new_homework.get('current_date', current_timestamp)
+            current_timestamp = new_homework.get(
+                'current_date',
+                current_timestamp
+            )
             time.sleep(1200)
 
         except requests.exceptions.RequestException as error:
