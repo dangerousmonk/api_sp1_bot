@@ -10,7 +10,8 @@ from helpers import TokenFormatter
 PRAKTIKUM_TOKEN = os.environ['PRAKTIKUM_TOKEN']
 TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
 CHAT_ID = os.environ['TELEGRAM_CHAT_ID']
-PRAKTIKUM_API_HOMEWORK_URL = 'https://praktikum.yandex.ru/api/user_api/homework_statuses/'
+PRAKTIKUM_API_HOMEWORK_URL = \
+    'https://praktikum.yandex.ru/api/user_api/homework_statuses/'
 LOG_FORMAT = '%(asctime)s, %(levelname)s, %(message)s, %(name)s'
 
 logging.basicConfig(
@@ -34,7 +35,8 @@ def parse_homework_status(homework):
     elif homework['status'] == 'reviewing':
         verdict = 'Вашу работу приняли на ревью!'
     else:
-        verdict = 'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
+        verdict = 'Ревьюеру всё понравилось, ' \
+                  'можно приступать к следующему уроку.'
     return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
 
 
@@ -62,7 +64,9 @@ def main():
         try:
             new_homework = get_homework_statuses(current_timestamp)
             if new_homework.get('homeworks'):
-                send_message(parse_homework_status(new_homework.get('homeworks')[0]), bot)
+                send_message(parse_homework_status(
+                    new_homework.get('homeworks')[0]
+                ), bot)
                 logging.info('Отправлено сообщение со статусом изменения проверки проекта.')
             current_timestamp = new_homework.get('current_date', current_timestamp)
             time.sleep(1200)
