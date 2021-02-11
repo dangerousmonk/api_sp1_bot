@@ -71,7 +71,7 @@ def main():
                 send_message(parse_homework_status(
                     new_homework.get('homeworks')[0]
                 ), bot)
-                logging.info('Отправлено сообщение со статусом изменения проверки проекта.')
+                logging.info('Отправлено сообщение')
             current_timestamp = new_homework.get('current_date', current_timestamp)
             time.sleep(1200)
 
