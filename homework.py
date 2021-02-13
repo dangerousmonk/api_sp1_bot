@@ -30,6 +30,11 @@ for handler in logging.root.handlers:
 
 def parse_homework_status(homework):
     homework_name = homework['homework_name']
+    statuses = {
+        'rejected': 'К сожалению в работе нашлись ошибки.',
+        'reviewing': 'Вашу работу приняли на ревью!',
+        'approved': 'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
+    }
     if homework['status'] == 'rejected':
         verdict = 'К сожалению в работе нашлись ошибки.'
     elif homework['status'] == 'reviewing':
@@ -72,11 +77,11 @@ def main():
                     new_homework.get('homeworks')[0]
                 ), bot)
                 logging.info('Отправлено сообщение')
-            current_timestamp = new_homework.get(
+            '''current_timestamp = new_homework.get(
                 'current_date',
                 current_timestamp
-            )
-            time.sleep(1200)
+            )'''
+            time.sleep(10)
 
         except requests.exceptions.RequestException as error:
             send_message(f'Бот столкнулся с ошибкой: {error}', bot)
