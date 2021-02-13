@@ -51,7 +51,7 @@ def send_message(message, bot_client):
 def main():
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     logger.debug('Запуск бота')
-    current_timestamp = 0#int(time.time())
+    current_timestamp = int(time.time())
 
     while True:
         try:
@@ -61,17 +61,15 @@ def main():
                     new_homework.get('homeworks')[0]
                 ), bot)
                 logger.info('Отправлено сообщение')
-            '''current_timestamp = new_homework.get(
+            current_timestamp = new_homework.get(
                 'current_date',
                 current_timestamp
-            )'''
+            )
         except (RequestException, KeyError, JSONDecodeError) as error:
             send_message(f'Бот столкнулся с ошибкой: {error}', bot)
             logger.exception(error)
-        time.sleep(15)
+        time.sleep(20 * 60)
 
 
 if __name__ == '__main__':
     main()
-
-
