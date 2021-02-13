@@ -2,46 +2,30 @@ import os
 import time
 import requests
 import telegram
-import logging
-from logging.handlers import RotatingFileHandler
+import logging.config
+from requests.exceptions import RequestException
+from json.decoder import JSONDecodeError
 
-from helpers import TokenFormatter
+from helpers import LOGGING
 
 PRAKTIKUM_TOKEN = os.environ['PRAKTIKUM_TOKEN']
 TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
 CHAT_ID = os.environ['TELEGRAM_CHAT_ID']
 PRAKTIKUM_API_HOMEWORK_URL = \
     'https://praktikum.yandex.ru/api/user_api/homework_statuses/'
-LOG_FORMAT = '%(asctime)s, %(levelname)s, %(message)s, %(name)s'
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename='program.log',
-)
 logger = logging.getLogger(__name__)
-handler = RotatingFileHandler('program.log', maxBytes=50000000, backupCount=5)
-handler.setLevel(logging.DEBUG)
-logger.addHandler(handler)
-handler.setFormatter(TokenFormatter(LOG_FORMAT))
-logger.addHandler(handler)
-for handler in logging.root.handlers:
-    handler.setFormatter(TokenFormatter(LOG_FORMAT))
+logging.config.dictConfig(LOGGING)
 
 
 def parse_homework_status(homework):
-    homework_name = homework['homework_name']
     statuses = {
         'rejected': 'К сожалению в работе нашлись ошибки.',
         'reviewing': 'Вашу работу приняли на ревью!',
-        'approved': 'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
+        'approved': 'Ревьюеру всё понравилось, можно приступать к следующему уроку.',
     }
-    if homework['status'] == 'rejected':
-        verdict = 'К сожалению в работе нашлись ошибки.'
-    elif homework['status'] == 'reviewing':
-        verdict = 'Вашу работу приняли на ревью!'
-    else:
-        verdict = 'Ревьюеру всё понравилось, ' \
-                  'можно приступать к следующему уроку.'
+    homework_name = homework.get('homework_name', 'unknown_name')
+    homework_status = homework.get('status', 'unknown_status')
+    verdict = statuses.get(homework_status, 'unknown_verdict')
     return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
 
 
@@ -76,26 +60,18 @@ def main():
                 send_message(parse_homework_status(
                     new_homework.get('homeworks')[0]
                 ), bot)
-                logging.info('Отправлено сообщение')
+                logger.info('Отправлено сообщение')
             current_timestamp = new_homework.get(
                 'current_date',
                 current_timestamp
             )
-            time.sleep(1200)
-
-        except requests.exceptions.RequestException as error:
+        except (RequestException, KeyError, JSONDecodeError) as error:
             send_message(f'Бот столкнулся с ошибкой: {error}', bot)
             logger.exception(error)
-            time.sleep(1200)
-        except KeyError as error:
-            send_message(f'Бот столкнулся с ошибкой: {error}', bot)
-            logger.exception(error)
-            time.sleep(1200)
-        except ValueError as error:
-            send_message(f'Бот столкнулся с ошибкой: {error}', bot)
-            logger.exception(error)
-            time.sleep(1200)
+        time.sleep(15)
 
 
 if __name__ == '__main__':
     main()
+
+
