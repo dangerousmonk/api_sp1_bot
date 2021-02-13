@@ -61,10 +61,10 @@ def main():
                     new_homework.get('homeworks')[0]
                 ), bot)
                 logger.info('Отправлено сообщение')
-            current_timestamp = new_homework.get(
+            '''current_timestamp = new_homework.get(
                 'current_date',
                 current_timestamp
-            )
+            )'''
         except (RequestException, KeyError, JSONDecodeError) as error:
             send_message(f'Бот столкнулся с ошибкой: {error}', bot)
             logger.exception(error)
